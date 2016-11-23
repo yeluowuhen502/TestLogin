@@ -78,7 +78,6 @@ private Button btn2;
         @Override
         public void onComplete(SHARE_MEDIA platform, int action, Map<String, String> data) {
             Toast.makeText(getApplicationContext(), "Authorize succeed", Toast.LENGTH_SHORT).show();
-
         }
 
         @Override
