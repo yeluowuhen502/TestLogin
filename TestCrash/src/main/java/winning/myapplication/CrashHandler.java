@@ -11,11 +11,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
@@ -23,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Created by Jiang on 2016/11/25.
@@ -46,11 +46,15 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     @SuppressLint("SimpleDateFormat")
     private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
-    /** 保证只有一个CrashHandler实例 */
+    /**
+     * 保证只有一个CrashHandler实例
+     */
     private CrashHandler() {
     }
 
-    /** 获取CrashHandler实例 ,单例模式 */
+    /**
+     * 获取CrashHandler实例 ,单例模式
+     */
     public static CrashHandler getInstance() {
         return INSTANCE;
     }
@@ -73,7 +77,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        if (!handleException(ex) && mDefaultHandler != null) {
+        if (handleException(ex) && mDefaultHandler != null) {
             //如果用户没有处理则让系统默认的异常处理器来处理
             mDefaultHandler.uncaughtException(thread, ex);
         } else {
@@ -85,6 +89,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             //退出程序
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(1);
+
+//            ExitAppUtils.getInstance().exit();
         }
     }
 
@@ -111,11 +117,16 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         collectDeviceInfo(mContext);
         //保存日志文件
         saveCrashInfo2File(ex);
+        //将字符串POST到服务器
+//        postErrorInfo(ex);
         return true;
     }
 
+    //将字符串POST到服务器
+
     /**
      * 收集设备参数信息
+     *
      * @param ctx
      */
     public void collectDeviceInfo(Context ctx) {
@@ -147,7 +158,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      * 保存错误信息到文件中
      *
      * @param ex
-     * @return	返回文件名称,便于将文件传送到服务器
+     * @return 返回文件名称, 便于将文件传送到服务器
      */
     private String saveCrashInfo2File(Throwable ex) {
 
@@ -158,6 +169,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             sb.append(key + "=" + value + "\n");
         }
 
+        Log.d("info", sb.toString());
         Writer writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
         ex.printStackTrace(printWriter);
@@ -189,5 +201,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         }
         return null;
     }
+
 }
 

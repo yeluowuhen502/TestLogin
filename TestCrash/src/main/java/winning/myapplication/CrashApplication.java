@@ -11,7 +11,7 @@ public class CrashApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        CrashHandler crashHandler = CrashHandler.getInstance();
-        crashHandler.init(this);
+        CustomCrashHandler crashHandler = CustomCrashHandler.getInstance();
+        crashHandler.setCustomCrashHanler(getApplicationContext());
     }
 }
